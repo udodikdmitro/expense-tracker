@@ -29,7 +29,7 @@ PostgreSQL (Docker, порт 5433)        — таблиця expense
 
 | Колонка        | Тип SQL         | Поле Java                | Правила                    |
 |----------------|-----------------|--------------------------|----------------------------|
-| `id`           | `BIGSERIAL` PK  | `Long id`                | генерується базою          |
+| `id`           | `BIGINT IDENTITY` PK | `Long id`                | генерується базою          |
 | `amount`       | `NUMERIC(12,2)` | `BigDecimal amount`      | обов'язкове, > 0           |
 | `category`     | `VARCHAR(50)`   | `String category`        | обов'язкове, до 50 символів |
 | `description`  | `VARCHAR(255)`  | `String description`     | необов'язкове, до 255      |
@@ -115,21 +115,21 @@ expense-traker/
 
 **Чого навчимось:** чому `target/` не комітять, історія змін як «точки збереження».
 
-## Етап 4 — Сутність і репозиторій (шар даних)
+## Етап 4 — Сутність і репозиторій (шар даних) ✅
 
-- [ ] 4.1 `model/Expense.java`:
+- [x] 4.1 `model/Expense.java`:
   - `@Entity`, `@Table(name = "expense")`;
   - `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)`;
   - `@Column(precision = 12, scale = 2, nullable = false)` для `amount`;
   - `@Column(name = "expense_date", nullable = false)` для `date` (`date` — зарезервоване слово в SQL);
   - валідація: `@NotNull @Positive` для суми, `@NotBlank @Size(max = 50)` для категорії, `@Size(max = 255)` для опису, `@NotNull` для дати;
   - порожній конструктор (потрібен JPA), геттери й сеттери.
-- [ ] 4.2 Запустити застосунок → у логах `create table expense ...` → `\d expense` у psql показує колонки.
-- [ ] 4.3 `repository/ExpenseRepository.java` — `interface ExpenseRepository extends JpaRepository<Expense, Long>`:
+- [x] 4.2 Запустити застосунок → у логах `create table expense ...` → `\d expense` у psql показує колонки.
+- [x] 4.3 `repository/ExpenseRepository.java` — `interface ExpenseRepository extends JpaRepository<Expense, Long>`:
   - `List<Expense> findByDateBetweenOrderByDateDescIdDesc(LocalDate from, LocalDate to)`;
   - `List<Expense> findByCategoryAndDateBetweenOrderByDateDescIdDesc(String category, LocalDate from, LocalDate to)`;
   - `@Query("select coalesce(sum(e.amount), 0) from Expense e where e.date between :from and :to and (:category is null or e.category = :category)") BigDecimal sumAmount(...)`.
-- [ ] 4.4 Перевірка: кілька тестових рядків через psql (`INSERT INTO expense ...`) — вони знадобляться на наступних етапах.
+- [x] 4.4 Перевірка: кілька тестових рядків через psql (`INSERT INTO expense ...`) — вони знадобляться на наступних етапах. Методи репозиторію перевірено на цих даних: фільтр за датами, за категорією, сума (606.24 за жовтень, 471.25 для «Їжа»).
 
 **Чого навчимось:** ORM-відображення класу на таблицю, derived query methods (SQL з назви методу), JPQL.
 
