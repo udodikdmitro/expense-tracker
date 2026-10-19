@@ -8,14 +8,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "expense")
+// every list/summary query filters and sorts by date
+@Table(name = "expense", indexes = @Index(name = "idx_expense_date", columnList = "expense_date"))
 public class Expense {
 
     @Id
@@ -24,6 +27,8 @@ public class Expense {
 
     @NotNull
     @Positive
+    // must fit NUMERIC(12,2); otherwise PostgreSQL silently rounds (0.001 -> 0.00) or overflows
+    @Digits(integer = 10, fraction = 2)
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
@@ -33,6 +38,7 @@ public class Expense {
     private String category;
 
     @Size(max = 255)
+    @Column(length = 255)
     private String description;
 
     // "date" is a reserved word in SQL, so the column gets a different name
