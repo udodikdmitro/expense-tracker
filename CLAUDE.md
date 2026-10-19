@@ -17,6 +17,13 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<op
 - Subject in English, imperative mood, lowercase, no trailing period, ≤ 72 chars (e.g. `feat(api): add expense CRUD endpoints`). Add a body explaining *why* when it isn't obvious.
 - One commit per completed PLAN.md stage (or a smaller logical step); commit only verified, working code. Never commit `target/` or IDE files.
 
+## Branches and pull requests
+- `main` always holds working code; never commit to it directly. Every PLAN.md stage (or task) gets its own branch created from an up-to-date `main`.
+- Branch name: `<type>/<short-kebab-case-description>`, with `<type>` from the commit types above (e.g. `feat/expense-entity-repository`, `fix/timezone-on-connect`, `docs/readme`).
+- Finish the work on the branch (verified, PLAN.md updated), push it and open a pull request into `main`.
+- PR title follows the commit convention (it becomes the squash commit on `main`); the body says what changed, which PLAN.md steps it covers, and how it was verified.
+- Merge with "Squash and merge" after the user reviews it, then delete the branch and `git switch main && git pull` before starting the next stage.
+
 ## Gotchas
 - Keep `TimeZone.setDefault(TimeZone.getTimeZone("Europe/Kyiv"))` at the start of `main` in `ExpenseTrackerApplication`: macOS reports the legacy id `Europe/Kiev`, which PostgreSQL 16 rejects on connect.
 - The schema is created by Hibernate (`spring.jpa.hibernate.ddl-auto=update`); there are no migrations yet.
